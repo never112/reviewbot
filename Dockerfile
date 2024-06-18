@@ -13,10 +13,9 @@ FROM aslan-spock-register.qiniu.io/alpine:3.20 as runner
 # Do not install unnecessary tools to reduce image size.
 RUN set -eux  \
     apk update && \
-    apk --no-cache add ca-certificates luacheck cppcheck shellcheck git openssh \
+    apk --no-cache add ca-certificates luacheck cppcheck shellcheck git openssh
 
-RUN apt-get update && apt-get install -y curl \
-    && rm -rf /var/lib/apt/lists/*
+
 #install pmd
 ENV PMD_DOWNLOAD_URL https://github.com/pmd/pmd/releases/download/pmd_releases%2F7.1.0/pmd-dist-7.1.0-bin.zip
 ENV PMD_DOWNLOAD_SHA256 0d31d257450f85d995cc87099f5866a7334f26d6599dacab285f2d761c049354
