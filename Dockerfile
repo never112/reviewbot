@@ -1,4 +1,4 @@
-FROM library/golang:1.22.3 as builder
+FROM aslan-spock-register.qiniu.io/golang:1.22.3 as builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux go build -v -trimpath -o /reviewbot . \ 
     && GOPATH=/go go install -ldflags="-extldflags=-static" github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1
 
-FROM alpine:3.20 as runner
+FROM aslan-spock-register.qiniu.io/alpine:3.20 as runner
 
 # if you want to install other tools, please add them here.
 # Do not install unnecessary tools to reduce image size.
