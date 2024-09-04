@@ -59,19 +59,14 @@ func ListPullRequestsWithCommit(ctx context.Context, gc *github.Client, owner st
 	}
 	var pullRequests []*github.PullRequest
 
-	for {
-		files, response, err := gc.PullRequests.ListPullRequestsWithCommit(ctx, owner, repo, head_sha, &opts)
-		if err != nil {
-			return nil, nil
-		}
-		pullRequests = append(pullRequests, files...)
-
-		if response.NextPage == 0 {
-			return pullRequests, response
-		}
-
-		opts.Page++
+	files, response, err := gc.PullRequests.ListPullRequestsWithCommit(ctx, owner, repo, head_sha, &opts)
+	if err != nil {
+		return nil, nil
 	}
+	pullRequests = append(pullRequests, files...)
+
+	return pullRequests, response
+
 }
 
 // ListPullRequestsComments lists all comments on the specified pull request.
