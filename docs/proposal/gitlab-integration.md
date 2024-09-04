@@ -3,7 +3,7 @@
 
 ## Background
 
-> see [issue](https://github.com/qiniu/reviewbot/issues/215)
+
 
 当前reviewbot只支持以github作为源码管理的代码合并review工具，为了使reviewbot适合更多用户的的使用，让reviewbot与其他源码管理平台的也能无缝集成使用。
 
@@ -28,7 +28,7 @@
 ## 整体设计
 
 不破坏现有部署架构，请求路径仍然是 webhook ->MergeRequestEvent->LinterCommand> Report,但是 由于gitlab 与github 功能上，API提供上都有些差异，在细节上又些许区别
-webhook ->MergeRequestEvent→ gitpull代码-> DiffFile → lineter command-> comments-on-merge-requests/discussions。
+webhook ->MergeRequestEvent→ gitpull代码-> DiffFile → lineter command-> comments-on-merge-requests/discussions 。
 
 
 > 方便起见，Reviewbot 实例下面会简称为节点
