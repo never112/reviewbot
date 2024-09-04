@@ -152,10 +152,25 @@ func (s *Server) processCheckRunRequestEvent(ctx context.Context, event *github.
 		log.Debugf("skipping action %s\n", event.GetAction())
 		return nil
 	}
+
 	pevent := github.PullRequestEvent{}
 	pevent.Repo = event.GetRepo()
-	pevent.PullRequest = event.GetCheckRun().PullRequests[0]
+	pevent.Repo = event.GetRepo()
+	head_sha := event.GetCheckRun().HeadSHA
+	var owner *string
+	owner = event.GetRepo().Owner.Name
+	repo := event.GetRepo().Name
+	installationID := event.GetInstallation().GetID()
+	owner = event.GetRepo().Owner.Name
+	plist, err := linters.ListPullRequestsWithCommit(ctx, s.GithubClient(installationID), *owner, *repo, *head_sha)
+	if err != nil {
+		log.Debugf("List pullreqeust fail  %v\n", err)
+		return nil
+	}
+	log.Debugf("List Pullreqeust length  %v\n", len(plist))
+	pevent.PullRequest = plist[0]
 	pevent.Installation = event.GetInstallation()
+
 	return s.handle(ctx, &pevent)
 }
 
@@ -164,9 +179,23 @@ func (s *Server) processCheckSuiteEvent(ctx context.Context, event *github.Check
 		log.Debugf("skipping action %s\n", event.GetAction())
 		return nil
 	}
+	head_sha := event.GetCheckSuite().HeadSHA
 	pevent := github.PullRequestEvent{}
 	pevent.Repo = event.GetRepo()
-	pevent.PullRequest = event.GetCheckSuite().PullRequests[0]
+	var owner *string
+	owner = event.GetRepo().Owner.Name
+	repo := event.GetRepo().Name
+	installationID := event.GetInstallation().GetID()
+
+	//ListPullRequestsWithCommit(ctx context.Context, owner, repo, sha string, opts *ListOptions)
+	//commit, r, err := github.PullRequestsService.ListPullRequestsWithCommit(ctx, s.GithubClient(installationID), *owner, *repo, *head_sha, nil)
+	plist, err := linters.ListPullRequestsWithCommit(ctx, s.GithubClient(installationID), *owner, *repo, *head_sha)
+	if err != nil {
+		log.Debugf("List pullreqeust fail  %v\n", err)
+		return nil
+	}
+	log.Debugf("List Pullreqeust length  %v\n", len(plist))
+	pevent.PullRequest = plist[0]
 	pevent.Installation = event.GetInstallation()
 	return s.handle(ctx, &pevent)
 }
@@ -302,6 +331,13 @@ func (s *Server) githubAccessTokenClient() *github.Client {
 
 // GithubClient returns a github client
 func (s *Server) GithubClient(installationID int64) *github.Client {
+	if s.accessToken != "" {
+		return s.githubAccessTokenClient()
+	}
+	return s.githubAppClient(installationID)
+}
+
+func (s *Server) GitLabClient(installationID int64) *github.Client {
 	if s.accessToken != "" {
 		return s.githubAccessTokenClient()
 	}

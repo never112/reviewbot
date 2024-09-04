@@ -52,6 +52,28 @@ func ListPullRequestsFiles(ctx context.Context, gc *github.Client, owner string,
 	}
 }
 
+// ListFiles lists all files for the specified pull request.
+func ListPullRequestsWithCommit(ctx context.Context, gc *github.Client, owner string, repo string, head_sha string) ([]*github.PullRequest, *github.Response) {
+	opts := github.ListOptions{
+		PerPage: 100,
+	}
+	var pullRequests []*github.PullRequest
+
+	for {
+		files, response, err := gc.PullRequests.ListPullRequestsWithCommit(ctx, owner, repo, head_sha, &opts)
+		if err != nil {
+			return nil, nil
+		}
+		pullRequests = append(pullRequests, files...)
+
+		if response.NextPage == 0 {
+			return pullRequests, response
+		}
+
+		opts.Page++
+	}
+}
+
 // ListPullRequestsComments lists all comments on the specified pull request.
 // TODO(CarlJi): add pagination support.
 func ListPullRequestsComments(ctx context.Context, gc *github.Client, owner string, repo string, number int) ([]*github.PullRequestComment, error) {
