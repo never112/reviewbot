@@ -161,7 +161,7 @@ func (s *Server) processCheckRunRequestEvent(ctx context.Context, event *github.
 	org := event.GetRepo().GetOwner().GetLogin()
 	repo := event.GetRepo().GetName()
 	installationID := event.GetInstallation().GetID()
-	plist, err := linters.ListPullRequestsWithCommit(ctx, s.GithubClient(installationID), org, repo, head_sha)
+	plist, err := linters.FilterPullRequestsWithCommit(ctx, s.GithubClient(installationID), org, repo, head_sha)
 	if err != nil {
 		log.Debugf("List pullreqeust fail  %v\n", err)
 		return nil
@@ -188,7 +188,7 @@ func (s *Server) processCheckSuiteEvent(ctx context.Context, event *github.Check
 
 	//ListPullRequestsWithCommit(ctx context.Context, owner, repo, sha string, opts *ListOptions)
 	//commit, r, err := github.PullRequestsService.ListPullRequestsWithCommit(ctx, s.GithubClient(installationID), *owner, *repo, *head_sha, nil)
-	plist, err := linters.ListPullRequestsWithCommit(ctx, s.GithubClient(installationID), org, repo, head_sha)
+	plist, err := linters.FilterPullRequestsWithCommit(ctx, s.GithubClient(installationID), org, repo, head_sha)
 	if err != nil {
 		log.Debugf("List pullreqeust fail  %v\n", err)
 		return nil

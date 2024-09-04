@@ -53,20 +53,34 @@ func ListPullRequestsFiles(ctx context.Context, gc *github.Client, owner string,
 }
 
 // ListFiles lists all files for the specified pull request.
-func ListPullRequestsWithCommit(ctx context.Context, gc *github.Client, owner string, repo string, head_sha string) ([]*github.PullRequest, *github.Response) {
+func ListPullRequestsWithCommit(ctx context.Context, gc *github.Client, owner string, repo string, headSha string) ([]*github.PullRequest, *github.Response) {
 	opts := github.ListOptions{
-		PerPage: 100,
+		PerPage: 10,
 	}
 	var pullRequests []*github.PullRequest
 
-	files, response, err := gc.PullRequests.ListPullRequestsWithCommit(ctx, owner, repo, head_sha, &opts)
+	files, response, err := gc.PullRequests.ListPullRequestsWithCommit(ctx, owner, repo, headSha, &opts)
 	if err != nil {
 		return nil, nil
 	}
 	pullRequests = append(pullRequests, files...)
-
 	return pullRequests, response
+}
 
+func FilterPullRequestsWithCommit(ctx context.Context, gc *github.Client, owner string, repo string, headSha string) ([]*github.PullRequest, error) {
+	plopt := github.PullRequestListOptions{}
+	var repullRequests []*github.PullRequest
+	fmt.Printf("repos/%v/%v/%s/pulls", owner, repo, headSha)
+	pullRequests, _, err := gc.PullRequests.List(ctx, owner, repo, &plopt)
+	for _, pullRequest := range pullRequests {
+		if *pullRequest.Head.SHA == headSha {
+			repullRequests = append(repullRequests, pullRequest)
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	return repullRequests, nil
 }
 
 // ListPullRequestsComments lists all comments on the specified pull request.
