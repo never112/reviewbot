@@ -31,11 +31,11 @@ WORKDIR /
 
 
 # SSH config
-#RUN mkdir -p /root/.ssh && chown -R root /root/.ssh/ &&  chgrp -R root /root/.ssh/ \
-#    && git config --global url."git@github.com:".insteadOf https://github.com/ \
-#    && git config --global url."git://".insteadOf https://
-#COPY deploy/config /root/.ssh/config
-#COPY deploy/github-known-hosts /github_known_hosts
+RUN mkdir -p /root/.ssh && chown -R root /root/.ssh/ &&  chgrp -R root /root/.ssh/ \
+    && git config --global url."git@github.com:".insteadOf https://github.com/ \
+    && git config --global url."git://".insteadOf https://
+COPY deploy/config /root/.ssh/config
+COPY deploy/github-known-hosts /github_known_hosts
 
 # set go proxy and private repo
 RUN go env -w GOPROXY=https://goproxy.cn,direct \
